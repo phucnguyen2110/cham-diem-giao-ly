@@ -77,6 +77,7 @@ function renderBoard(changed = []) {
   $('#final-banner').hidden = !finalistView;
   const teams = totals().filter((team) => !finalistView || state.finalists.includes(team.id));
   const hasScores = teams.some((team) => team.total > 0);
+  const topFour = new Set(teams.slice(0, 4).map((team) => team.id));
   let rank = 1;
   const ranks = new Map();
   teams.forEach((team, index) => {
@@ -88,7 +89,9 @@ function renderBoard(changed = []) {
     const rank = ranks.get(team.id);
     const card = node('li', 'team-card');
     card.dataset.team = team.id;
-    if (rank === 1 && hasScores) card.classList.add('leader');
+    if (hasScores && (state.round < 2 ? topFour.has(team.id) : rank === 1)) {
+      card.classList.add('leader');
+    }
     if (changed.includes(team.id)) card.classList.add('score-change');
     const top = node('div', 'team-top');
     if (hasScores) {
