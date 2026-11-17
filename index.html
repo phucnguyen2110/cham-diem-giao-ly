@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Bảng điểm chung kết Đố vui Kinh Thánh 2026 của Ngành Thiếu Nhi, Giáo xứ Chợ Cầu.">
   <title>Bảng điểm · Đố vui Kinh Thánh 2026</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -42,16 +42,8 @@
     </div>
     <nav class="rounds operator" id="rounds" aria-label="Vòng thi"></nav>
     <div class="workspace">
-      <section class="board" aria-label="Điểm các đội">
-        <div class="board-meta"><span id="team-count"></span><span>Tổng điểm</span></div>
-        <ol class="team-grid" id="board"></ol>
-        <div id="final-banner" class="final-banner" hidden>
-          <p class="eyebrow"><span></span> Vòng 3 · Giải mã ánh sáng</p>
-          <h3>4 đội vào vòng cuối</h3>
-        </div>
-      </section>
-      <aside class="score-panel operator" aria-labelledby="score-title">
-        <div class="panel-head"><h3 id="score-title">Nhập điểm</h3></div>
+      <aside class="score-panel operator" id="cham-diem" aria-labelledby="score-title" tabindex="-1">
+        <div class="panel-head"><h3 id="score-title">Nhập điểm</h3><a class="mobile-jump" href="#diem-cac-doi">Xem bảng điểm</a></div>
         <div id="qualification" hidden>
           <p>Chọn đúng 4 đội vào vòng cuối. Nếu đồng điểm, chọn theo quyết định của BTC.</p>
           <div class="choices" id="finalist-choices"></div>
@@ -68,6 +60,14 @@
         </form>
         <p id="status" role="status"></p>
       </aside>
+      <section class="board" id="diem-cac-doi" aria-label="Điểm các đội" tabindex="-1">
+        <div class="board-meta"><span id="team-count"></span><span>Tổng điểm</span><a class="mobile-jump operator" href="#cham-diem">Về nhập điểm</a></div>
+        <ol class="team-grid" id="board"></ol>
+        <div id="final-banner" class="final-banner" hidden>
+          <p class="eyebrow"><span></span> Vòng 3 · Giải mã ánh sáng</p>
+          <h3>4 đội vào vòng cuối</h3>
+        </div>
+      </section>
     </div>
     <footer><span>Thi đua Giáo lý 2026 · Giáo xứ Chợ Cầu</span><span class="operator" id="save-status">Điểm lưu trên trình duyệt này</span></footer>
   </main>

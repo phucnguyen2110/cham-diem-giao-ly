@@ -376,12 +376,15 @@ function renderHistory() {
 if (projector) {
   document.body.classList.add('projector');
   window.opener?.postMessage({ key, ready: true }, '*');
+  const touchScreen = matchMedia('(pointer: coarse)').matches;
+  $('#fullscreen').hidden = touchScreen && !document.fullscreenEnabled;
   $('#fullscreen').onclick = async () => {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await document.documentElement.requestFullscreen();
     } catch {
-      $('#fullscreen').textContent = 'Dùng F11 để toàn màn hình';
+      if (touchScreen) $('#fullscreen').hidden = true;
+      else $('#fullscreen').textContent = 'Dùng F11 để toàn màn hình';
     }
   };
   document.addEventListener('fullscreenchange', () => {
