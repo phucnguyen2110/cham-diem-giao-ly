@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bảng điểm chung kết Đố vui Kinh Thánh 2026 của Ngành Thiếu Nhi, Giáo xứ Chợ Cầu.">
+  <title>Bảng điểm · Đố vui Kinh Thánh 2026</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap mast-inner">
+      <div class="brand"><img src="assets/xu-doan.webp" alt=""><div><strong>Giáo xứ Chợ Cầu</strong><small>Xứ đoàn Giáo hoàng Phaolô VI</small></div></div>
+      <div class="mast-actions">
+        <a id="present" class="outline operator" href="?trinh-chieu=1" target="chocau-trinh-chieu"><span class="screen-icon" aria-hidden="true"></span> Trình chiếu</a>
+        <button id="fullscreen" class="outline audience" type="button">Toàn màn hình</button>
+      </div>
+    </div>
+  </header>
+  <section class="hero" aria-labelledby="event-title">
+    <div class="wrap hero-inner">
+      <div class="hero-copy">
+        <p class="eyebrow hero-label"><span></span> Chung kết · Ngành Thiếu Nhi</p>
+        <h1 id="event-title">Đố vui<br><em>Kinh Thánh</em></h1>
+        <p class="hero-sub">Tin Mừng Thánh Matthêu</p>
+        <p class="event-date">06.12.2026 <span>·</span> Sân nhà giáo lý</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="halo"></div><span class="spark spark-one">✦</span><span class="spark spark-two">✧</span>
+        <div class="art-frame"><img src="assets/mattheu.webp" alt=""></div>
+        <div class="verse">“Lời Chúa là ngọn đèn soi cho con bước” <span>Tv 119,105</span></div>
+      </div>
+    </div>
+  </section>
+  <main class="wrap">
+    <div class="board-heading">
+      <div><p class="eyebrow operator"><span></span> Kết quả chung kết</p><h2>Bảng điểm</h2></div>
+      <div class="board-actions operator"><button class="outline" id="show-history" type="button">Lịch sử</button><button class="outline" id="show-teams" type="button">Tên đội</button></div>
+      <p class="audience" id="audience-round"></p>
+    </div>
+    <nav class="rounds operator" id="rounds" aria-label="Vòng thi"></nav>
+    <div class="workspace">
+      <section class="board" aria-label="Điểm các đội">
+        <div class="board-meta"><span id="team-count"></span><span>Tổng điểm</span></div>
+        <ol class="team-grid" id="board"></ol>
+        <div id="final-banner" class="final-banner" hidden>
+          <p class="eyebrow"><span></span> Vòng 3 · Giải mã ánh sáng</p>
+          <h3>4 đội vào vòng cuối</h3>
+        </div>
+      </section>
+      <aside class="score-panel operator" aria-labelledby="score-title">
+        <div class="panel-head"><span aria-hidden="true">+</span><h3 id="score-title">Nhập điểm</h3></div>
+        <div id="qualification" hidden>
+          <p>Chọn đúng 4 đội vào vòng cuối. Nếu đồng điểm, chọn theo quyết định của BTC.</p>
+          <div class="choices" id="finalist-choices"></div>
+          <button id="confirm-finalists" class="primary" type="button">Xác nhận 4 đội</button>
+        </div>
+        <form id="score-form">
+          <p id="question-label"></p>
+          <label>Điểm cho đáp án đúng<input id="question-points" type="number" step="1" min="1" max="999" required inputmode="numeric" placeholder="Nhập mức điểm"></label>
+          <div id="point-choices" class="points" aria-label="Mức điểm nhanh"></div>
+          <fieldset id="answers"><legend>Đánh dấu kết quả</legend><div id="team-choices"></div></fieldset>
+          <button class="primary" type="submit">Chốt câu <span aria-hidden="true">↗</span></button>
+        </form>
+        <p id="status" role="status"></p>
+      </aside>
+    </div>
+    <footer><span>Thi đua Giáo lý 2026 · Giáo xứ Chợ Cầu</span><span class="operator" id="save-status">Điểm lưu trên trình duyệt này</span></footer>
+  </main>
+  <dialog id="history">
+    <div class="dialog-head"><h2>Lịch sử điểm</h2><button type="button" class="outline" data-close>Đóng</button></div>
+    <p>Mỗi lần ghi điểm có thể được hoàn tác riêng.</p>
+    <div id="history-list"></div>
+    <button id="reset" class="outline danger" type="button">Xoá toàn bộ điểm</button>
+    <p id="history-status" role="status"></p>
+  </dialog>
+  <dialog id="teams">
+    <div class="dialog-head"><h2>Tên đội</h2><button type="button" class="outline" data-close>Đóng</button></div>
+    <form id="team-form"><div id="team-fields"></div><button class="primary" type="submit">Lưu tên đội</button></form>
+  </dialog>
+  <dialog id="edit-score" aria-labelledby="edit-score-title">
+    <div class="dialog-head"><h2 id="edit-score-title">Sửa điểm</h2><button type="button" class="outline" data-close>Đóng</button></div>
+    <form id="edit-score-form">
+      <label>Vòng cần sửa<select id="edit-score-round"></select></label>
+      <label>Điểm của đội trong vòng này<input id="edit-score-points" type="number" min="0" max="99999" step="1" inputmode="numeric" required></label>
+      <p id="edit-score-status" role="status"></p>
+      <button class="primary" type="submit">Lưu điểm</button>
+    </form>
+  </dialog>
+  <dialog id="confirm"><form method="dialog"><h2 id="confirm-title"></h2><p id="confirm-text"></p><div class="confirm-actions"><button value="cancel" class="outline" autofocus>Huỷ</button><button value="yes" class="primary">Xác nhận</button></div></form></dialog>
+</body>
+</html>
