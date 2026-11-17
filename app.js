@@ -94,7 +94,7 @@ function renderBoard(changed = []) {
     }
     if (changed.includes(team.id)) card.classList.add('score-change');
     const top = node('div', 'team-top');
-    if (hasScores) {
+    if (hasScores && projector) {
       const badge = node('span', 'rank', rank);
       badge.setAttribute('aria-label', 'Hạng ' + rank);
       top.append(badge);
@@ -102,17 +102,15 @@ function renderBoard(changed = []) {
     top.append(node('span', 'team-name', team.name));
     const score = node('div', 'team-score', team.total);
     score.append(node('span', '', 'điểm'));
-    card.append(top, score);
     if (!projector) {
-      const detail = node('div', 'team-detail');
-      detail.append(node('span', '', team.scores.map((value, i) => 'V' + (i + 1) + ' ' + value).join(' · ')));
+      card.classList.add('editable-card');
       const edit = node('button', 'text-button edit-team-score', 'Sửa điểm');
       edit.type = 'button';
       edit.setAttribute('aria-label', 'Sửa điểm · ' + team.name);
       edit.onclick = () => openScoreEditor(team.id);
-      detail.append(edit);
-      card.append(detail);
+      top.append(edit);
     }
+    card.append(top, score);
     board.append(card);
   }
   $('#team-count').textContent = teams.length + ' đội';
@@ -273,7 +271,9 @@ function renderForm() {
   for (const id of ids) {
     const row = node('div', 'answer-row');
     row.dataset.id = id;
-    row.append(node('strong', '', state.names[id]), answerOption(id, 'correct', 'Đúng'), answerOption(id, 'wrong', 'Sai'));
+    const options = node('div', 'answer-segment');
+    options.append(answerOption(id, 'correct', 'Đúng'), answerOption(id, 'wrong', 'Sai'));
+    row.append(node('strong', '', state.names[id]), options);
     $('#team-choices').append(row);
   }
   const fill = node('button', 'text-button', 'Đánh Sai cho đội chưa chọn');

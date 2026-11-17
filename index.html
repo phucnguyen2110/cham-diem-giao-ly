@@ -51,7 +51,7 @@
         </div>
       </section>
       <aside class="score-panel operator" aria-labelledby="score-title">
-        <div class="panel-head"><span aria-hidden="true">+</span><h3 id="score-title">Nhập điểm</h3></div>
+        <div class="panel-head"><h3 id="score-title">Nhập điểm</h3></div>
         <div id="qualification" hidden>
           <p>Chọn đúng 4 đội vào vòng cuối. Nếu đồng điểm, chọn theo quyết định của BTC.</p>
           <div class="choices" id="finalist-choices"></div>
@@ -59,10 +59,12 @@
         </div>
         <form id="score-form">
           <p id="question-label"></p>
-          <label>Điểm cho đáp án đúng<input id="question-points" type="number" step="1" min="1" max="999" required inputmode="numeric" placeholder="Nhập mức điểm"></label>
-          <div id="point-choices" class="points" aria-label="Mức điểm nhanh"></div>
-          <fieldset id="answers"><legend>Đánh dấu kết quả</legend><div id="team-choices"></div></fieldset>
-          <button class="primary" type="submit">Chốt câu <span aria-hidden="true">↗</span></button>
+          <div class="point-controls">
+            <label>Điểm cho câu này<input id="question-points" type="number" step="1" min="1" max="999" required inputmode="numeric" placeholder="Nhập điểm"></label>
+            <div id="point-choices" class="points" role="group" aria-label="Mức điểm nhanh"></div>
+          </div>
+          <fieldset id="answers"><legend>Kết quả từng đội</legend><div id="team-choices"></div></fieldset>
+          <button class="primary" type="submit">Chốt câu</button>
         </form>
         <p id="status" role="status"></p>
       </aside>
