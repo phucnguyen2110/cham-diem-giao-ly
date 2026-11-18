@@ -26,6 +26,8 @@ let keyword = false;
 let editingFinalists = false;
 let finalistSignature = '';
 let editingTeam;
+const seenScoreEntries = new Set(state.entries.map((entry) => entry.id));
+const scoreBursts = new Map();
 
 function node(tag, className, content) {
   const item = document.createElement(tag);
@@ -61,6 +63,16 @@ function totals() {
 }
 
 function renderBoard(changed = []) {
+  if (projector) {
+    for (const entry of state.entries) {
+      if (seenScoreEntries.has(entry.id)) continue;
+      seenScoreEntries.add(entry.id);
+      if (entry.type === 'correction' || entry.round !== state.round) continue;
+      for (const id of entry.correct) {
+        scoreBursts.set(id, { points: entry.points, round: entry.round, expires: Date.now() + 2400 });
+      }
+    }
+  }
   const board = $('#board');
   const finalistView = state.round === 2 && state.finalists.length === 4;
   const signature = finalistView ? state.finalists.join(',') : '';
@@ -111,6 +123,14 @@ function renderBoard(changed = []) {
       top.append(edit);
     }
     card.append(top, score);
+    const burst = scoreBursts.get(team.id);
+    if (projector && burst?.round === state.round && burst.expires > Date.now()) {
+      const badge = node('span', 'score-burst', '+' + burst.points);
+      badge.setAttribute('aria-hidden', 'true');
+      badge.style.animationDelay = '-' + (2400 - (burst.expires - Date.now())) + 'ms';
+      card.append(badge);
+      window.setTimeout(() => badge.remove(), burst.expires - Date.now());
+    }
     board.append(card);
   }
   $('#team-count').textContent = teams.length + ' đội';
