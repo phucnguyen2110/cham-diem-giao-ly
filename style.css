@@ -99,6 +99,13 @@ main.wrap{padding-top:25px}
 .board-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:15px}
 .board-heading h2{font-size:clamp(2rem,3.2vw,3rem);margin:5px 0 0;letter-spacing:-.052em;line-height:1.02}
 .board-actions{display:flex;gap:8px}
+.board-actions{flex-wrap:wrap;justify-content:flex-end}
+.submit-score{display:flex;align-items:center;gap:10px}
+.submit-score #selection-count{flex:1;white-space:nowrap;font-size:.76rem;color:var(--muted)}
+.submit-score #selection-count.complete{color:#195132;font-weight:800}
+.score-panel .submit-score .primary{width:auto;flex:none}
+.backup-actions{display:flex;flex-wrap:wrap;gap:10px}
+#backup-status:empty{display:none}
 .rounds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fcfaf4;margin-bottom:20px}
 .rounds button{color:var(--ink);background:none;border:0;border-right:1px solid var(--line);padding:12px 14px;text-align:left;font-weight:800;line-height:1.3}
 .rounds button:last-child{border-right:0}
@@ -327,6 +334,8 @@ dialog h2{margin:0;letter-spacing:-.04em}
   .projector .team-grid{gap:8px}
 }
 @media(max-width:510px){
+  body:not(.projector) .board-heading{align-items:flex-start;flex-direction:column;gap:12px}
+  body:not(.projector) .board-actions{justify-content:flex-start}
   .team-card{display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:5px}
   .team-score{align-items:start;flex-direction:row;gap:4px;align-items:baseline}
   .editable-card .team-top{gap:0}

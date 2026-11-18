@@ -19,6 +19,52 @@ function readState() {
     return initial();
   }
 }
+
+function parseBackup(text) {
+  const file = JSON.parse(text);
+  if (file.format !== 'cho-cau-scoreboard' || file.version !== 1) throw new Error('File không đúng định dạng sao lưu của bảng điểm.');
+  const data = file.state;
+  const teamId = (id) => Number.isInteger(id) && id >= 0 && id < 9;
+  const teamList = (ids) => Array.isArray(ids) && ids.every(teamId) && new Set(ids).size === ids.length;
+  if (!data || !Array.isArray(data.names) || data.names.length !== 9 ||
+      !data.names.every((name) => typeof name === 'string' && name.trim().length > 0 && name.length <= 32) ||
+      !Number.isInteger(data.round) || data.round < 0 || data.round > 2 ||
+      !teamList(data.finalists) || ![0, 4].includes(data.finalists.length) ||
+      !Array.isArray(data.entries) || data.entries.length > 10000) {
+    throw new Error('Tên đội, vòng thi hoặc danh sách đội trong file không hợp lệ.');
+  }
+  const ids = new Set();
+  const questions = new Set();
+  const entries = data.entries.map((entry) => {
+    if (!entry || typeof entry.id !== 'string' || !entry.id || entry.id.length > 100 ||
+        ids.has(entry.id) || !Number.isInteger(entry.round) || entry.round < 0 || entry.round > 2 ||
+        !Number.isInteger(entry.points)) throw new Error('Lịch sử điểm trong file không hợp lệ.');
+    ids.add(entry.id);
+    if (entry.type === 'correction') {
+      if (!teamId(entry.team) || entry.points < 0 || entry.points > 99999 ||
+          !Number.isSafeInteger(entry.previous) || entry.previous < 0 ||
+          (entry.round === 2 && !data.finalists.includes(entry.team))) {
+        throw new Error('Một lần sửa điểm trong file không hợp lệ.');
+      }
+      return { id: entry.id, type: 'correction', team: entry.team, round: entry.round, previous: entry.previous, points: entry.points };
+    }
+    const validQuestion = Number.isInteger(entry.number) && entry.number >= 1 && entry.number <= rounds[entry.round].count;
+    const questionKey = entry.round + ':' + entry.number;
+    const expected = entry.round === 2 ? data.finalists : data.names.map((_, index) => index);
+    if (entry.type !== undefined || (!validQuestion && !(entry.round === 2 && entry.number === 'keyword')) ||
+        questions.has(questionKey) || entry.points < 1 || entry.points > 999 ||
+        !teamList(entry.correct) || !teamList(entry.wrong) ||
+        entry.correct.some((id) => entry.wrong.includes(id)) ||
+        entry.correct.length + entry.wrong.length !== expected.length ||
+        ![...entry.correct, ...entry.wrong].every((id) => expected.includes(id)) ||
+        (entry.round === 2 && expected.length !== 4)) {
+      throw new Error('Một câu đã chấm trong file không hợp lệ.');
+    }
+    questions.add(questionKey);
+    return { id: entry.id, round: entry.round, number: entry.number, points: entry.points, correct: entry.correct, wrong: entry.wrong };
+  });
+  return { names: data.names, round: data.round, finalists: data.finalists, entries };
+}
 let state = readState();
 let displayWindow;
 let confirmAction;
@@ -271,6 +317,7 @@ function renderForm() {
   pointInput.disabled = !hasQuestion;
   $('#answers').disabled = true;
   form.querySelector('button[type=submit]').disabled = !hasQuestion;
+  $('.submit-score').hidden = !hasQuestion;
   $('#point-choices').replaceChildren();
   $('#team-choices').replaceChildren();
   $('#answers').hidden = !hasQuestion;
@@ -302,6 +349,7 @@ function renderForm() {
     for (const row of answerRows()) {
       if (!row.querySelector(':checked')) row.querySelector('input[value=wrong]').checked = true;
     }
+    updateSelectionCount();
   };
   $('#team-choices').append(fill);
   updateAnswers();
@@ -316,6 +364,14 @@ function updateAnswers() {
   const ready = !!points.value && points.validity.valid;
   $('#answers').disabled = !ready;
   $('#score-form button[type=submit]').disabled = !ready;
+  updateSelectionCount();
+}
+
+function updateSelectionCount() {
+  const rows = answerRows();
+  const selected = rows.filter((row) => row.querySelector(':checked')).length;
+  $('#selection-count').textContent = 'Đã chọn ' + selected + '/' + rows.length + ' đội';
+  $('#selection-count').classList.toggle('complete', rows.length > 0 && selected === rows.length);
 }
 
 function renderRounds() {
@@ -411,6 +467,48 @@ if (projector) {
     $('#fullscreen').textContent = document.fullscreenElement ? 'Thoát toàn màn hình' : 'Toàn màn hình';
   });
 } else {
+  $('#answers').addEventListener('change', updateSelectionCount);
+  $('#show-backup').onclick = () => {
+    $('#backup-status').textContent = '';
+    $('#backup').showModal();
+  };
+  $('#export-backup').onclick = () => {
+    const file = { format: 'cho-cau-scoreboard', version: 1, exportedAt: new Date().toISOString(), state: readState() };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }));
+    const link = node('a', '');
+    link.href = url;
+    link.download = 'bang-diem-' + new Date().toISOString().replace(/[:.]/g, '-') + '.json';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+    $('#backup-status').textContent = 'Đã tạo file sao lưu. Câu đang nhập cần được chốt để có trong file.';
+  };
+  $('#import-backup').onclick = () => $('#backup-file').click();
+  $('#backup-file').onchange = async () => {
+    const file = $('#backup-file').files[0];
+    $('#backup-file').value = '';
+    if (!file) return;
+    try {
+      if (file.size > 5 * 1024 * 1024) throw new Error('File sao lưu vượt quá 5 MB.');
+      const restored = parseBackup(await file.text());
+      requestConfirm('Khôi phục điểm từ file',
+        'File có 9 đội, ' + restored.entries.length + ' lần ghi điểm và đang ở vòng ' + (restored.round + 1) +
+        '. Dữ liệu hiện tại sẽ được thay bằng dữ liệu trong file. Hãy xuất sao lưu trước nếu cần giữ điểm hiện tại.', () => {
+          if (!store(restored)) {
+            $('#backup-status').textContent = 'Trình duyệt chưa lưu được dữ liệu. Vui lòng thử lại.';
+            return;
+          }
+          keyword = false;
+          editingFinalists = false;
+          render();
+          $('#status').textContent = '';
+          $('#backup-status').textContent = 'Đã khôi phục điểm. Màn chiếu cùng trình duyệt đã được cập nhật.';
+        });
+    } catch (error) {
+      $('#backup-status').textContent = error instanceof SyntaxError ? 'File JSON bị lỗi hoặc chưa tải đầy đủ.' : error.message;
+    }
+  };
   $('#edit-score-round').onchange = updateScoreEditor;
   $('#edit-score-form').onsubmit = (event) => {
     event.preventDefault();

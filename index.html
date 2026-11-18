@@ -37,7 +37,7 @@
   <main class="wrap">
     <div class="board-heading">
       <div><p class="eyebrow operator"><span></span> Kết quả chung kết</p><h2>Bảng điểm</h2></div>
-      <div class="board-actions operator"><button class="outline" id="show-history" type="button">Lịch sử</button><button class="outline" id="show-teams" type="button">Tên đội</button></div>
+      <div class="board-actions operator"><button class="outline" id="show-history" type="button">Lịch sử</button><button class="outline" id="show-teams" type="button">Tên đội</button><button class="outline" id="show-backup" type="button">Sao lưu</button></div>
       <p class="audience" id="audience-round"></p>
     </div>
     <nav class="rounds operator" id="rounds" aria-label="Vòng thi"></nav>
@@ -56,7 +56,7 @@
             <div id="point-choices" class="points" role="group" aria-label="Mức điểm nhanh"></div>
           </div>
           <fieldset id="answers"><legend>Kết quả từng đội</legend><div id="team-choices"></div></fieldset>
-          <button class="primary" type="submit">Chốt câu</button>
+          <div class="submit-score"><span id="selection-count" role="status"></span><button class="primary" type="submit">Chốt câu</button></div>
         </form>
         <p id="status" role="status"></p>
       </aside>
@@ -81,6 +81,16 @@
   <dialog id="teams">
     <div class="dialog-head"><h2>Tên đội</h2><button type="button" class="outline" data-close>Đóng</button></div>
     <form id="team-form"><div id="team-fields"></div><button class="primary" type="submit">Lưu tên đội</button></form>
+  </dialog>
+  <dialog id="backup" aria-labelledby="backup-title">
+    <div class="dialog-head"><h2 id="backup-title">Sao lưu điểm</h2><button type="button" class="outline" data-close>Đóng</button></div>
+    <p>Lưu tên đội, điểm các vòng, lịch sử chấm và danh sách đội đi tiếp vào một file để chuyển máy hoặc phục hồi.</p>
+    <div class="backup-actions">
+      <button class="primary" id="export-backup" type="button">Xuất file sao lưu</button>
+      <button class="outline" id="import-backup" type="button">Nhập file sao lưu</button>
+    </div>
+    <input id="backup-file" type="file" accept=".json,application/json" hidden>
+    <p id="backup-status" role="status"></p>
   </dialog>
   <dialog id="edit-score" aria-labelledby="edit-score-title">
     <div class="dialog-head"><h2 id="edit-score-title">Sửa điểm</h2><button type="button" class="outline" data-close>Đóng</button></div>
